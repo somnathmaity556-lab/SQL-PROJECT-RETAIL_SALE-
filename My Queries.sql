@@ -1,3 +1,77 @@
+CREATE DATABASE PROJECT;
+
+CREATE TABLE retail_sales
+(
+    transactions_id INT PRIMARY KEY,
+    sale_date DATE,	
+    sale_time TIME,
+    customer_id INT,	
+    gender VARCHAR(10),
+    age INT,
+    category VARCHAR(35),
+    quantity INT,
+    price_per_unit FLOAT,	
+    cogs FLOAT,
+    total_sale FLOAT
+);
+
+SELECT 
+    COUNT(*) 
+FROM retail_sales
+
+-- Data Cleaning
+SELECT * FROM retail_sales
+WHERE 
+    transactions_id IS NULL
+    OR
+    sale_date IS NULL
+    OR 
+    sale_time IS NULL
+    OR
+    gender IS NULL
+    OR
+    age IS NULL
+	OR
+	category IS NULL
+    OR
+    quantity IS NULL
+    OR
+    cogs IS NULL
+    OR
+    total_sale IS NULL;
+
+DELETE FROM retail_sales
+WHERE 
+   transactions_id IS NULL
+    OR
+    sale_date IS NULL
+    OR 
+    sale_time IS NULL
+    OR
+    gender IS NULL
+    OR
+    age IS NULL
+	OR
+	category IS NULL
+    OR
+    quantity IS NULL
+    OR
+    cogs IS NULL
+    OR
+    total_sale IS NULL;
+
+-- Data Exploration
+
+-- How many sales we have?
+SELECT COUNT(*) as total_sale FROM retail_sales
+
+-- How many uniuque customers we have ?
+
+SELECT COUNT(DISTINCT customer_id) as total_sale FROM retail_sales
+
+-- the unique category we have ?
+SELECT DISTINCT category FROM retail_sales
+
 SELECT * FROM RETAIL_SALES
 
 -- Q.1 Write a SQL query to retrieve all columns for sales made on '2022-11-05'
@@ -27,15 +101,6 @@ Select Gender, Category , count(transactions_id) as total_no_trans from retail_S
 Group by 1,2
 
 -- -- Q.7 Write a SQL query to calculate the average sale for each month. Find out best selling month in each year
-/*
-select 	
-		extract (year from sale_date) as year , 
-		extract (month from sale_date) as month, 
-		Round (avg(total_sale),0) as Avg_sale
-from retail_sales
-group by 1,2
-ORDER BY 1,3 DESC
-*/
 Select 
 	YEAR,
 	MONTH,
@@ -53,11 +118,6 @@ ORDER BY YEAR DESC;
 
 -- Q.8 Write a SQL query to find the top 5 customers based on the highest total sales 
 
-SELECT * FROM RETAIL_SALES 
-select  distinct customer_id, sum(total_sale) as total_sales
-from retail_Sales 
-group by 1 
-order by sum(total_sale) desc
 
 select * from (
 			select customer_id,
@@ -70,7 +130,7 @@ select * from (
 
 -- Q.9 Write a SQL query to find the number of unique customers who purchased items from each category.
 SELECT CATEGORY, 
-	cOUNT (DISTINCT CUSTOMER_ID) AS UNIQUE_CUST  
+	COUNT (DISTINCT CUSTOMER_ID) AS UNIQUE_CUST  
 FROM RETAIL_SALES
 GROUP BY 1
 
@@ -118,6 +178,7 @@ select
 	Count(transactions_id) as total_sale
 from hourly_sale
 group by 1;
+
 
 
 												---END OF PROJECT 
