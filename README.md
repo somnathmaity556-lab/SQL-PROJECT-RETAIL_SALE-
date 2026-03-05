@@ -1,12 +1,12 @@
-# Retail Sales Analysis SQL Project
+# Books Store SQL Project
 
 ## Project Overview
 
-**Project Title**: Retail Sales Analysis  
+**Project Title**: Book Store data Analysis  
 **Level**: Beginner  
-**Database**: `p1_retail_db`
+**Database**: `PROJECT`
 
-This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze retail sales data. The project involves setting up a retail sales database, performing exploratory data analysis (EDA), and answering specific business questions through SQL queries. This project is ideal for those who are starting their journey in data analysis and want to build a solid foundation in SQL.
+This project is designed to demonstrate SQL skills and techniques typically used by data analysts to explore, clean, and analyze retail sales data. The project involves setting up a retail sales database, performing exploratory data analysis (EDA), and answering specific business questions through SQL queries. 
 
 ## Objectives
 
@@ -19,11 +19,11 @@ This project is designed to demonstrate SQL skills and techniques typically used
 
 ### 1. Database Setup
 
-- **Database Creation**: The project starts by creating a database named `p1_retail_db`.
+- **Database Creation**: The project starts by creating a database named `PROJECT`.
 - **Table Creation**: A table named `retail_sales` is created to store the sales data. The table structure includes columns for transaction ID, sale date, sale time, customer ID, gender, age, product category, quantity sold, price per unit, cost of goods sold (COGS), and total sale amount.
 
 ```sql
-CREATE DATABASE p1_retail_db;
+CREATE DATABASE PROJECT;
 
 CREATE TABLE retail_sales
 (
@@ -116,59 +116,68 @@ WHERE total_sale > 1000
 
 6. **Write a SQL query to find the total number of transactions (transaction_id) made by each gender in each category.**:
 ```sql
-SELECT 
-    category,
-    gender,
-    COUNT(*) as total_trans
-FROM retail_sales
-GROUP 
-    BY 
-    category,
-    gender
-ORDER BY 1
+Select Gender, 
+        Category , 
+        count(transactions_id) as total_no_trans 
+from retail_Sales 
+Group by 1,2
 ```
 
 7. **Write a SQL query to calculate the average sale for each month. Find out best selling month in each year**:
 ```sql
-SELECT 
-       year,
-       month,
-    avg_sale
-FROM 
-(    
-SELECT 
-    EXTRACT(YEAR FROM sale_date) as year,
-    EXTRACT(MONTH FROM sale_date) as month,
-    AVG(total_sale) as avg_sale,
-    RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC) as rank
-FROM retail_sales
-GROUP BY 1, 2
-) as t1
-WHERE rank = 1
+Select 
+	YEAR,
+	MONTH,
+	AVG_SALE
+from 
+		(select 
+				extract (year from sale_date) as year , 
+				extract (month from sale_date) as month, 
+				Round (avg(total_sale),0) as avg_sale,
+				dense_rank () over (PARTITION BY extract (year from sale_date) ORDER BY (avg(total_sale))) as rank
+		from retail_Sales
+		Group by 1,2) AS RNK
+WHERE RANK = 1
+ORDER BY YEAR DESC;
 ```
 
 8. **Write a SQL query to find the top 5 customers based on the highest total sales **:
 ```sql
-SELECT 
-    customer_id,
-    SUM(total_sale) as total_sales
-FROM retail_sales
-GROUP BY 1
-ORDER BY 2 DESC
-LIMIT 5
+select * 
+from (
+        select customer_id,
+        sum(total_sale) as total_sales,
+        dense_rank () over(order by (sum(total_sale)) desc ) as rank
+        from retail_sales
+        group by 1) as rnk
+where rank in (1,2,3,4,5)
 ```
 
 9. **Write a SQL query to find the number of unique customers who purchased items from each category.**:
 ```sql
-SELECT 
-    category,    
-    COUNT(DISTINCT customer_id) as cnt_unique_cs
-FROM retail_sales
-GROUP BY category
+SELECT CATEGORY, 
+	COUNT (DISTINCT CUSTOMER_ID) AS UNIQUE_CUST  
+FROM RETAIL_SALES
+GROUP BY 1
 ```
 
 10. **Write a SQL query to create each shift and number of orders (Example Morning <12, Afternoon Between 12 & 17, Evening >17)**:
 ```sql
+select 
+	Shift,
+	Count(*) as no_of_Orders 
+from (
+		SELECT*, 
+			CASE 
+				WHEN EXTRACT(HOUR FROM SALE_TIME) <12 THEN 'MORNING'
+				WHEN EXTRACT (HOUR FROM SALE_TIME) BETWEEN 12 AND 17 THEN 'AFTERNOON'
+			ELSE 'NIGHT' 
+			END AS SHIFT 
+		FROM RETAIL_sALES) as t1
+group by shift
+
+--OR 
+
 WITH hourly_sale
 AS
 (
@@ -204,24 +213,4 @@ GROUP BY shift
 
 This project serves as a comprehensive introduction to SQL for data analysts, covering database setup, data cleaning, exploratory data analysis, and business-driven SQL queries. The findings from this project can help drive business decisions by understanding sales patterns, customer behavior, and product performance.
 
-## How to Use
 
-1. **Clone the Repository**: Clone this project repository from GitHub.
-2. **Set Up the Database**: Run the SQL scripts provided in the `database_setup.sql` file to create and populate the database.
-3. **Run the Queries**: Use the SQL queries provided in the `analysis_queries.sql` file to perform your analysis.
-4. **Explore and Modify**: Feel free to modify the queries to explore different aspects of the dataset or answer additional business questions.
-
-## Author - Zero Analyst
-
-This project is part of my portfolio, showcasing the SQL skills essential for data analyst roles. If you have any questions, feedback, or would like to collaborate, feel free to get in touch!
-
-### Stay Updated and Join the Community
-
-For more content on SQL, data analysis, and other data-related topics, make sure to follow me on social media and join our community:
-
-- **YouTube**: [Subscribe to my channel for tutorials and insights](https://www.youtube.com/@zero_analyst)
-- **Instagram**: [Follow me for daily tips and updates](https://www.instagram.com/zero_analyst/)
-- **LinkedIn**: [Connect with me professionally](https://www.linkedin.com/in/najirr)
-- **Discord**: [Join our community to learn and grow together](https://discord.gg/36h5f2Z5PK)
-
-Thank you for your support, and I look forward to connecting with you!
